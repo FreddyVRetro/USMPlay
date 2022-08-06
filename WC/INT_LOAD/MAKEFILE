@@ -1,0 +1,45 @@
+# Makefile for the USM player ( WATCOM C Version )
+# It can be use by borland make.exe and watcom wmake.exe
+#
+# (c) 1996 FreddyV/Useless
+
+TARGET = play.exe
+
+# USM play lib file
+LIB   = ..\..\LIB\usmpws.lib
+#LIB   = ..\..\LIB\usmpwr.lib
+
+# USM play include files directory
+INC   = ..\..\SRC
+
+# WATCOM C include directory
+CINC  = ..\..\..\WATCOM\H
+
+# PMODE/W or DOS/4GW Extender
+SYSTEM = pmodew
+#SYSTEM = dos4g
+
+#-----------------------------------------------------------------------------
+
+# C compiler parameters
+# ---------------------
+#
+
+CPARAM   = -i=$(CINC) -i=$(INC) -s
+#CPARAM   = -i=$(CINC) -i=$(INC) -s -3s
+
+C        = WCC386
+LINK     = WLINK
+
+OBJLIST     = play.obj
+
+#
+#                       ** Files link **
+#
+
+$(TARGET)   : $(OBJLIST)
+                $(LINK) @WATCOM.LNK file play file $(LIB) system $(SYSTEM) name $(TARGET)
+#     pmwlite /c4 $(TARGET)
+
+play.obj    : play.c $(INC)\usmplay.h
+                $(C) $(CPARAM) play.c

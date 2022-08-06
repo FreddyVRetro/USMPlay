@@ -1,0 +1,97 @@
+# Makefile for the USM player ( DOS32 Version )
+# Use Borland MAKE.EXE
+#
+# (c) 1996-1997 FreddyV/Useless
+
+# DOS32 BIN Directory
+DOS32 = D:\EXTENDER\DOS32\BIN
+
+# USM play source directory
+SRC   = ..\SRC
+
+# USM play include files directory
+INC   = ..\SRC
+
+# Assembler parameters
+# --------------------
+# /m2        2 passes
+# /t         Supress messages if successfull assembly
+# /dUseDOS32 Use DOS32 DOS Extender
+
+ASMPARAM = /m2 /t /I$(INC) /dUseDOS32
+
+# Linker parameters
+# -----------------
+# /c  Compress file
+# /S  Include DOS32.EXE
+
+LINKPARAM = /L$(DOS32) /c /S
+
+ASM      = TASM $(ASMPARAM)
+LINK     = $(DOS32)\DLINK $(LINKPARAM)
+
+OBJLIST  = play.obj \
+	   error.obj usmplay.obj uss.obj ussvar.obj \
+	   iwdrv.obj gusdrv.obj sbdrv.obj nosnddrv.obj hpdrv.obj mix.obj \
+	   xmload.obj modload.obj loadutil.obj  \
+	   files.obj memory.obj utils.obj timer.obj hardware.obj
+
+play.exe : $(OBJLIST)
+	   $(LINK) @dos32ver.lnk
+
+play.obj    : play.asm $(SRC)\utils.inc
+	      $(ASM) play.asm
+
+error.obj   : $(SRC)\error.asm
+	      $(ASM) $(SRC)\error.asm
+
+usmplay.obj : $(SRC)\usmplay.asm $(SRC)\utils.inc setup.inc
+	      $(ASM) $(SRC)\usmplay.asm
+	      
+uss.obj     : $(SRC)\uss.asm $(SRC)\uss.inc $(SRC)\utils.inc setup.inc
+	      $(ASM) $(SRC)\uss.asm
+	      
+ussvar.obj  : $(SRC)\ussvar.asm $(SRC)\utils.inc
+	      $(ASM) $(SRC)\ussvar.asm
+
+iwdrv.obj  : $(SRC)\iwdrv.asm  $(SRC)\gusdrv.inc $(SRC)\utils.inc
+	      $(ASM) $(SRC)\iwdrv.asm
+	      
+gusdrv.obj  : $(SRC)\gusdrv.asm  $(SRC)\gusdrv.inc $(SRC)\utils.inc
+	      $(ASM) $(SRC)\gusdrv.asm
+
+sbdrv.obj   : $(SRC)\sbdrv.asm $(SRC)\utils.inc setup.inc
+	      $(ASM) $(SRC)\sbdrv.asm
+
+nosnddrv.obj : $(SRC)\nosnddrv.asm $(SRC)\utils.inc setup.inc
+	       $(ASM) $(SRC)\nosnddrv.asm
+
+hpdrv.obj    : $(SRC)\hpdrv.asm $(SRC)\utils.inc $(SRC)\mix.inc setup.inc
+	       $(ASM) $(SRC)\hpdrv.asm
+
+mix.obj      : $(SRC)\mix.asm $(SRC)\utils.inc $(SRC)\mix.inc setup.inc
+	       $(ASM) $(SRC)\mix.asm
+
+xmload.obj  : $(SRC)\xmload.asm $(SRC)\xmload.inc $(SRC)\utils.inc
+	      $(ASM) $(SRC)\xmload.asm
+	      
+modload.obj : $(SRC)\modload.asm $(SRC)\modload.inc $(SRC)\utils.inc
+	      $(ASM) $(SRC)\modload.asm
+	      
+loadutil.obj: $(SRC)\loadutil.asm $(SRC)\loadutil.inc $(SRC)\utils.inc
+	      $(ASM) $(SRC)\loadutil.asm
+
+files.obj   : $(SRC)\files.asm $(SRC)\files.inc $(SRC)\utils.inc
+	      $(ASM) $(SRC)\files.asm
+
+memory.obj  : $(SRC)\memory.asm $(SRC)\memory.inc $(SRC)\utils.inc setup.inc
+	      $(ASM) $(SRC)\memory.asm
+
+utils.obj   : $(SRC)\utils.asm $(SRC)\utils.inc
+	      $(ASM) $(SRC)\utils.asm
+
+timer.obj   : $(SRC)\timer.asm $(SRC)\timer.inc $(SRC)\utils.inc setup.inc
+	      $(ASM) $(SRC)\timer.asm
+
+hardware.obj   : $(SRC)\hardware.asm $(SRC)\hardware.inc $(SRC)\utils.inc setup.inc
+		 $(ASM) $(SRC)\hardware.asm

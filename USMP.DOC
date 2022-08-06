@@ -1,0 +1,706 @@
+
+
+                ÛÛ   Û  ÛÛÛÛÛ   ÛÛÛ ÛÛ      /---/  /       /---/   \   /
+                ÛÛ   Û  ÛÛ      ÛÛ Û Û     /---/  /       /---/     \-/
+                ÛÛ   Û  ßßßßÛ   ÛÛ   Û    /      /____   /   /       /
+                ßßßßßß  ßßßßß   ßß   ß
+
+                     Useless Module Player v1.1 (08/??/1998)
+
+                             By FreddyV/Useless
+
+
+     
+     1.  Introduction
+     2.  Features and overall description
+	2.1. Player structure
+	2.2. Availables XM features
+	2.3. Availables IT features
+        2.4. ProTracker compatibility
+     3.  Files description
+     4.  How to use USM play
+	4.1. Sound devices setup
+	4.2. Loading and playing a music
+	4.3. Synchronisation
+        4.4. Vertical retrace synchro
+	4.5. The setup file
+        4.6. How to use USMPLAY in your intro.
+     5.  Timer and memory functions.
+        5.1. Timer functions (in TIMER.ASM)
+        5.2. Memory functions (in MEMORY.ASM)
+     6.  Known bugs and problems
+     7.  Greetings
+     8.  Disclaimer
+     9.  USMPLAY Future
+     10. How to contact us
+
+
+  1. Introduction.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+	A lot of coders were applying for a Sound Blaster and GUS XM player
+    using EOS, DOS32 or WATCOM. USM Play is made for them.
+
+       I have produced this sound system because our first demo was supposed
+    to be under DOS32 and, except MXM play, there were no DOS32 sound system.
+
+       After some months, we discovered EOS and we decided to move to it.
+
+       I decided to keep the DOS32 compatibility, that's why USM play is
+     a DOS32 and EOS sound system. It is also the ONLY DOS32 and EOS 
+     soundsystem with Impulse Tracker support !
+
+       The WATCOM support was added because 60% of the actual demos are made 
+     with it.
+
+
+  2. Features and overall description.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+       USM Play can play STM, S3M, MOD, IT, XM and USM files.
+
+       It was coded in full FLAT 32 bit ASM using the DOS32, EOS,
+     PMODE/W and DOS/4GW DOS extenders.
+
+       You can also use it with the DOS32 compatible dos extender like
+      WexT (made by Whizzter/Woorlic)
+
+       The player is designed to be used for demos and intros.
+
+       With the demos, you will have a full sound system including a file 
+     loader, a setup menu, a memory and timer manager, and GUS & SB drivers.
+
+       USM play can also be used for intros. It's possible to reduce its
+     size by removing some features (drivers and loaders) and you can link
+     the music in the exe file. (USM format only)
+
+
+    2.1. Player structure.
+								
+       There are 5 different parts in USM play:
+
+	  The general 'system' functions.
+	       They are the timer, memory, IRQ and DMA functions.
+
+	  The loaders.                                         
+	       USM Play can load STM, S3M, MOD, IT, XM and USM files.    
+               STM, S3M, MOD, IT and XM files are internally converted 
+            to USM format.
+
+	  The player.                                          
+               It plays the internal file format. (USM)         
+
+	  The sound system.
+               The sound system functions are totally independant on
+             the selected output device. It's here to hide the samples,
+             instruments and sound drivers from the player.
+
+	  The sound drivers.
+                I have done some drivers for the GUS, Interwave, SB sound cards
+              and internal PC speaker (it was just for fun) and no sound.
+
+	  
+    2.2. Available XM features.
+	      
+       USM Play was designed for Fast Tracker II compatibility.
+     So USM Play is not 100% ProTracker compatible. 
+
+       I'm working on ProTracker compatibility mode. (see section 2.4.)
+
+       All XM effects and features are supported except:
+	  
+	  Glissando control
+	  Set Finetune
+
+       These effects are quite never used, that's why they are not implemented
+    but let me know if you want to use them.	  
+
+
+    2.3. Available IT features.
+
+       Impulse Tracker support have been improved a lot, you can now play
+    the samples sustain loop, instrument volume envelopes and NNA.
+
+       With this, USMPLAY may be the first EOS and DOS32 sound system with
+    a 'correct' Impulse Tracker support.
+
+       Impulse Tracker replay is quite good when the music don't use the
+     not implemented IT functions. So if you want to do a demo with an
+     Impulse Tracker music, don't forget to show the following section to
+     your musician.
+
+       Anyway, I need you and your bug reports to make USM play as IT compatible
+     as possible. But don't report bugs about not implemented IT features...
+
+
+  o  Implemented and tested.
+  -  Implemented and not fully tested (may not be compatible).
+  x  Not implemented by now.
+  !  New in this USMPLAY version.
+
+  49/61 effects are implemented.
+
+  Volume Column Effects
+
+  o  Ax - Volume slide up
+  o  Bx - Volume slide down
+  o  Cx - Fine volume slide up
+  o  Dx - Fine volume slide down
+  x  Ex - Pitch slide down
+  x  Fx - Pitch slide up
+  x  Gx - Portamento
+  x  Hx - Vibrato with speed x
+
+
+  General Effects
+
+  o  Axx - Set speed (set number of frames per row)
+  o  Bxx - Jump to order
+  o  Cxx - Break to row xx of (next) pattern
+  o  Dxy - Volume slide, x=0 down; y=0 up; x=F fine down; y=F fine up
+  o  Exx - Pitch slide down by xx
+  o  EFx - Fine pitch slide down by x
+  o  EEx - Extra fine pitch slide down by x
+  o  Fxx - Pitch slide up by xx
+  o  FFx - Fine pitch slide down by x
+  o  FEx - Extra fine pitch slide down by x
+  -  Gxx - Portamento to note with speed xx
+  o  Hxy - Vibrato with speed x, depth y
+  -  Ixy - Tremor with ontime x, offtime y
+  -  Jxy - Arpeggio with halftones x and y
+  o  Kxy - Dual command: H00 and Dxy
+  -  Lxy - Dual command: G00 and Dxy
+  o  Mxx - Set channel volume to xx (0->40h)
+  o  Nxy - Channel volume slide, x=0 down; y=0 up; x=F fine down; y=F fine up
+  -  Oxx - Set sample offset to xx00h
+  o  Pxy - Panning slide, x=0 right; y=0 left; x=F fine right; y=F fine left
+  -  Qxy - Retrigger note every y frames with volume modifier x
+  -  Rxy - Tremelo with speed x, depth y
+  -  S3x - Set vibrato waveform
+  -  S4x - Set tremelo waveform
+  x  S5x - Set panbrello waveform
+  x  S6x - Pattern delay for x frames
+  o  S70 - Past note cut
+  o  S71 - Past note off
+  o  S72 - Past note fade
+  o  S73 - Set NNA to note cut
+  o  S74 - Set NNA to continue
+  o  S75 - Set NNA to note off
+  o  S76 - Set NNA to note fade
+  x  S77 - Turn Volume envelope off
+  x  S78 - Turn Volume envelope on
+  o  S8x - Set pan position
+  x  S91 - Set surround sound
+  !  SAy - Set sample offset high part yxx00h
+  o  SB0 - Set loopback point
+  o  SBx - Loop x times to loopback point
+  -  SCx - Note cut after x frames
+  -  SDx - Note delay for x frames
+  o  SEx - Pattern delay for x rows
+  x  SFx - Select parameterised MIDI Macro
+  o  T0x - Tempo slide down by x
+  o  T1x - Tempo slide up by x
+  o  Txx - Set tempo (20h->0FFh)
+  o  Uxy - Fine vibrato with speed x, depth y
+  o  Vxx - Set global volume to xx (0->80h)
+  o  Wxx - Global volume slide, x=0 down; y=0 up; x=F fine down; y=F fine up
+  o  Xxx - Set panning position (0->0FFh)
+  x  Yxy - Panbrello with speed x, depth y
+  x  Zxx - MIDI Macro
+
+
+  Samples replay
+
+  o  8/16 bit samples
+  o  Forward/Bidi Loop
+  o  Formard/Bidi sustain loop
+  o  Sample 'Fine tune'
+  o  Sample volume
+  o  Default volume
+  x  Default panning  I don't know how to do this as IT behave strangely with it.
+  -  Auto vibrato     
+  
+  Note: Auto vibrato use Linear AND Amiga slides in USMPLAY.
+    (It's in linear period only in IT but I don't know if I will change this)
+
+  
+  Instruments replay
+
+  o  New Note Action
+  -  Duplicate Check Action
+  x  Pitch-Pan separation/Pitch-Pan center
+  o  Fadeout
+  o  Global volume
+  x  Default panning
+  x  Random volume variation
+  x  Random panning variation
+  o  Note-Sample/Keyboard Table
+
+  o  Volume envelope
+  o  Panning envelope
+  x  Pitch envelope
+  
+
+  Module flags
+
+  x  Vol0MixOptimization
+  o  Use Instrument/Use Samples
+  o  Linear/Amiga slides
+  -  Link effect G's memory with Effect E/F.
+
+     IT effects mode:
+
+  o  Deeper/'faster' vibrato
+  x  Oxx effect change
+
+
+  Misc
+
+  
+    I'm using IT v2.12 and apparently this version has a completly bugged
+  retrig command. USMPLAY will play IT retrig as Scream Tracker 3 retrig.
+  (Retrig command is difficult to implement as it is different in each 
+   trackers, I had to make a choise)
+
+  Do you have more info about this bug ?
+
+    When there is a sample number with no note and this sample number is
+  different from the currenthy played sample , Impulse Tracker start the new 
+  sample but Fast Tracker and Scream Tracker don't.
+    I'v added a flag in USM files (F_SChange). When this flag is on, the
+  sample is started always when the sample number is changed (IT and ProTracker)
+
+    I don't know if it's correct for ProTracker, can somebody help me ?
+
+    I also need help with the Instruments/Samples default panning because
+  I don't know how it is implemented in Impulse Tracker...
+
+    I'v nothing more to say for the moment as I didn't test Impulse Tracker
+  a lot.
+
+    I got a working version of the IT compressed samples loader but it fails
+  on some samples, that's why it's not included.
+
+
+    2.4. ProTracker compatibility
+   
+    As explained in the XM section, USMPLAY was designed to be Fast Tracker 2 
+  compatible. Unfortunately, Fast Tracker 2 is not ProTracker compatible.
+  That's why I started to change the MOD replay to be as ProTracker compatible 
+  as possible. (I have to remove Fast Tracker 2 replay bugs ;-) )
+   
+    The MOD files created with Fast Tracker 2 are still played in the FT2 way.
+  These file has a different identifier (4CHN, 6CHN ... 32CH instead of M.K.)
+  from 'ProTracker' files. There is just a little problem, Fast Tracker 2
+  save the 4 channels files with the M.K. identifier so they will be played
+  in the Protracker mode. If you want to use you 4 channels Fast Tracker 2 file,
+  change the identifier to 4CHN or save it as a 6 channels files.
+
+  
+  3. Directory and Files description.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+   Source code files are in /SRC directory.
+ 
+        Player and sound system
+
+         usmplay.asm    Useless player (USM player)
+         usmplay.inc    Player functions definitions
+         uss.asm        Useless Sound System
+         uss.inc        Sound System functions definition
+         usm.inc        USM file structures (File format)
+         ussvar.asm     Sound system variables and constants
+         ussvar.inc
+
+        The sound drivers
+
+         iwdrv.asm      AMD Interwave Driver
+         gusdrv.asm     GUS Driver
+         gusdrv.inc
+         sbdrv.asm      Sound Blaster Driver
+         sbconst.inc
+         hpdrv.asm      PC speaker driver
+         nosnddrv.asm   No sound driver
+
+         mix.asm        Mixed device functions
+         mix.inc  
+
+        The loaders
+
+         stmload.asm    STM Loader
+         stmload.inc
+         s3mload.asm    S3M Loader
+         s3mload.inc
+         modload.asm    MOD Loader
+         modload.inc
+         xmload.asm     XM Loader
+         xmload.inc
+         itload.asm     IT Loader (Not complete)
+         itload.inc
+         usmload.asm    USM Loader
+         usmload.inc
+
+         loadutil.asm   Common functions for all the loaders
+         loadutil.inc
+
+        Misc files
+
+         files.asm      Files functions
+         files.inc
+         hardware.asm   DMA/IRQ and Environment variables functions
+         hardware.inc
+
+         memory.asm     Memory functions
+         memory.inc     Memory functions definition and Memory macro
+         timer.asm      Multi timers manager
+         timer.inc
+
+         err_code.inc
+         error.asm
+
+         utils.asm
+         utils.inc
+
+   The player examples are in \EOS\INTRO_PV, \EOS\INTRO_FV, \DOS32, \EX1, \EX2,
+   \WC\INT_LOAD, \WC\MEM_LOAD, WC\PLAY and \WCPP directory.
+
+   \DATA contains the music examples in XM and OBJ formats.
+
+   \LIB contains the USMPLAY WATCOM library:
+
+    USMPWS.LIB WATCOM Stack calling convention library.
+    USMPWR.LIB WATCOM Registers calling convention library.
+
+   Utilities:
+
+   USMCONV.EXE is the MOD/STM/S3M/XM/IT to USM converter.
+   BIN2INC.EXE is the binary files to ASM include converter.
+
+  4. How to use USM play.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+
+    4.1. Sound devices setup
+
+       Useless sound system has two setup functions.
+
+         USS_Setup: It's the setup menu function.
+
+         USS_AutoSetup: It does an automatic sound card detection.
+                         It's also smaller than USS_Setup. (Usefull for intros)
+
+       The Sound Blaster driver NEEDS the BLASTER environment variable.        
+
+       Example: BLASTER=A220 I10 D1 T3
+
+       The GUS driver needs the ULTRASND environment variable to get the port
+       number (210h ... 260h).
+
+       The AMD Interwave driver needs the INTERWAVE and ULTRASND environment 
+       variables.
+
+
+									       
+    4.2. Loading and playing a music                                           
+									       
+       See the example files, it's better than a long text.
+
+
+    4.3. Synchronisation.
+
+       With USM Play, you can synchronize your program with the music.         
+       You will have to put some Wxx command in the music with FT2.              
+       EFx command for Protracker files. (MOD)
+									       
+       When USM Play detects a Sync effects, it adds 1 to _SynchroCount and
+     it copies the effect parameter in _SynchroVal.
+       You can also detect the music end whith the _MusicEnd variable.         
+
+      ASM example:
+
+      _Loop:
+
+	    ...  (Your great 3D part)
+
+	    cmp _MusicEnd,0 (Or cmp _SynchroVal,xx)
+	    je _Loop
+
+      C example:
+
+	do
+	 {
+	  ...
+	 } while (MusicEnd==0); (Or Synchroval==xx)
+
+       You can also get information about the current order number, 
+     pattern number and row. (_Order, _Pattern and _Row variables)
+
+    4.4. Vertical retrace synchro.
+
+       The biggest problem for a coder is to get a correct synchro with
+     the vertical retrace. Before doing anything on the screen, you must
+     wait for the vertical retrace start to avoid 'flickers'.
+
+       Unfortunately, sound systems are working in the background and
+     they need CPU time to process the music. Sometimes, the vertical
+     retrace occurs inside the player interrupt and your display code will
+     'miss' the retrace. I can't correct this problem and it also occurs
+     with the others sound system.
+
+       Anyway, it's possible to count the number of frame with a timer and 
+     to skip some pictures in your animation when a frame is missed. 
+
+       For example, if the computer is slow, you can only display 35 frames/s 
+     instead of 70. With the help of the frame counter, you can know when a
+     frame is missed and adjust your animation speed.
+
+       You can look at the example 1 to know how to 'create' a frame counter.
+       There are also a timer example in WATCOM C/C++ examples.
+
+       If you have some info to correct these problems, please contact me.
+
+    4.5. The setup files.
+
+       SETUP.INC is the most important file for USM play.
+
+       The SETUP.INC file allows you to add or remove some USM play parts.
+     (See the comments in SETUP.INC)
+
+!       If you want a good sound quality with the SB driver, don't forget
+!     to adjust the mixing amplification in setup.inc.
+
+       To find the correct amplification value:
+
+       With usmp.exe, make the sound to be as loud as possible before hearing 
+     clics in MONO mode. Then use the ampli value you get in setup.inc or
+     with the USS_SetAmpli function.
+
+    4.6. How to use USMPLAY in your intro
+
+      USMPLAY code is not as tiny as MXMPLAY but it is small enaugh to be used
+    in intros. The main avantage of using MXMPLAY is that you have a full 32 bit
+    assembly code, easily portable to any dos extender and you have quite
+    nothing to do for making a party (GUS only) and a final version.
+
+      USMPLAY has now an 'intro mode'. You will just have to set IntroMode to
+    yes in setup.inc to compile USMPLAY in GUS only version without memory
+    functions, files loaders and all the code you don't need in a party version
+    intro.
+
+      In this mode USMPLAY load the music from memory. You can include the
+    music dirrectly in the code by converting it into an obj or include file.
+    For the EOS users, it's also possible to use the LoadInternalFile function,
+      All what you need is a pointer to the memory location of the file in USM
+    format. Your music is converted to an USM file with USMCONV.EXE. It also
+    creates a configuration file (MUS_EFX.INC) to desactivate all the not
+    needed replay options. (For example, it removes the vibrato table from the
+    code if you don't use any vibrato)
+      When you have the correct SETUP.INC and MUS_EFX.INC file, compile the
+    necessary files, link them with your intro and you're done ;-)
+
+     - How to do the final version of your intro from the party version ?
+
+      Now the party is over and you want to release a version of your intro
+    so that everybody can enjoy the music. You will have to add the SB driver
+    in your intro.
+
+      The main difference between the GUS and the SB driver is that the SB
+    driver needs the USMPLAY memory library to works (malloc, free... functions)
+      With EOS and DOS32, the USMPLAY memory library allocates all the memory
+    for its internal heap. But when you code your intro, you probably asked
+    for some memory to EOS or DOS32 so you will have no memory left for your own
+    memory allocations.
+
+      You can avoid this by saying to the memory library how many memory it
+    has to keep free for the DOS EXTENDER, it's the setup.inc 'NeededMem'
+    parameter. You can also do all your memory allocation before calling
+    USMP_LoadInternalModule because the USMPLAY memory allocation is done in
+    this function.
+
+      If you have done your own DOS extender, you will have to change the
+    memory allocation in MEMORY.ASM. (MEMORY_Init function)
+
+      Your memory problems are Ok ? Now, you will have to do some changes
+    in setup.inc (you can take the setup.inc file in EOS/INTRO_FV) because
+    you will have to activate some USMPLAY options.
+      Set 'UseSB', 'UseIW' 'UseDMA' and 'UseIRQEnable' to Yes in Intromode
+      parts.
+
+      I suggest you to save your music in the .MOD format instead of .XM if
+    you don't use instruments, USMPLAY code size and the .USM file size will be
+    smaller.
+
+  5. Timer and memory functions.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  
+   There is an example of timer and memory function call in the /EX1 directory.
+
+
+    5.1. Timer functions (in TIMER.ASM)
+
+       Since the player needs a timer, you must use the USM play timer
+     functions. USM play has its own timer library, it allows you to have
+     multiple timers. (The max number of timers can be changed in SETUP.INC)
+		       
+	  Timer_Start_
+
+	   Input: EAX Timer Procedure Offset
+		  EBX Timer Speed ( EBX/1193180 hz )
+		       
+	   Output: CF clear => Ok
+		   CF set   => EAX=TE_NoFreeTimer (No more timer available)
+
+	  Timer_Stop_
+
+	   Input: EAX Timer Proc to stop.
+
+	   Output: CF clear => Ok
+		   CF set   => EAX=TE_NotFound (It's not a correct proc offset)
+
+
+    5.2. Memory functions (in MEMORY.ASM)
+
+       USM play has its own memory heap, you can reduce the heap size if you
+     don't want to use the USM memory functions. (in SETUP.INC)
+
+       If you want to use EOS Load_Internal_File function, you must reduce
+     the usm play heap size because EOS need some memory.
+
+       You don't have to use these functions under WATCOM C/C++ because 
+     USM Play uses the C/C++ memory functions.
+
+
+	  _Maxavail  Return the length of the biggest available memory block.
+	  _Malloc    Allocate a memory block.
+	  _Calloc    Allocate and clear a memory block.
+	  _Free      Free a memory block.
+
+       You can also call memory functions with the equivalent macros.
+
+	  U_Maxavail
+	  U_Malloc
+	  U_Calloc
+	  U_Free
+
+
+   Example:
+       
+
+       U_Malloc 1024*2
+
+       This will allocate 2kb memory and return the allocated memory @
+     in eax.
+
+
+  6. Known bugs and problems
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+       DOS/4GW dos extender support was fixed. However, I suggest you to 
+     use PMODE/W when it's possible.
+
+       You must add the -s parameter when building your WATCOM code if you
+     use the timer. (To avoid the Stack Overflow error)
+
+       You MUST use TASM v4.0 to compile the player.
+       (It should crash if you use one other TASM version)
+
+       KERNEL 386 example was removed because of KERNEL 386 USMP version bugs.
+
+       For EOS users:
+
+       You can't use the EOS synchro functions with USM play as USM play
+     do it's own timer managing. To get a frame counter, proceed as in the
+     example 1.
+
+       If you use Warlock font system, don't include UTILS.INC because some
+     macros have the same name as display macro in the font system.
+     (write and writeln)
+
+
+  7. Greetings.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+        - Light Show & Hacker Croll
+           EOS and Magic biniou rulezzz ! (Yes, I love Magic biniou :) )
+
+        - Pascal/Cubic Team
+           Thanks for mxm play, it helped me a lot.
+
+        - Petteri Kangaslampi et Jarno Paananen
+           Thanks for MIDASS and your SB code.
+           (I was too lazy to do the SB driver 100% by myself, hope you will
+           not kill me for that...)
+
+        - TBF/HCL and PPC/HCL.
+          It was great to 'see' USM play in your Wired 97 demo.
+
+        - Phar and Roudoudou/Flower corp.
+
+        - Quick/Warm inside, Mercure/Warm inside & GMF
+
+        - GandalF/Pulse, The best Sysop in the world.
+
+        - Unreal/Pulse, Thank for your support and bug report.
+          (USMPLAY is in the Sunflower and Tribes demos ! :) )
+
+        - All my IRC friends (PaF, O_Menor, X-Man, rafale... )
+           I'm back on IRC but you are no more here :-((
+
+        - All Useless members
+           Hornet, Index, Satanic, -M-, Pulsar, SFC & Xortianc, Danube,
+           Sibao, Dines and Sacrilege.
+
+        - Nix/TBL
+           I'm still waiting for the DirectSound USMPlay driver !
+
+        - whizzter/woorlic
+           Thanks for your bug reports and your help.
+
+        - Blabla for being an USMPlay user.
+
+  8. Disclaimer
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+       Useless can't be made liable for any damages caused by this package.
+
+       USM play is FREEWARE and must not be sent, or used in any commercial
+     or shareware production.
+
+       If you want to use USM play in non-FREEWARE production, you must
+     contact me before.
+
+       The USM play original archive must be distributed in an unmodified form.
+
+  9. USMPLAY Future
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     I don't know how many time I will have to code this player. But you can
+   help me to improve it with your bug report or by added some code in it.
+
+     I'v done USMPLAY for you so I need you to make it as 'usable' as possible.
+
+      Should be add/improved in a "near" future:
+
+      - DirectSound driver (Nix/TBL has almost completed it)
+      - Configuration file Loading/saving (If somebody need it)
+      - ProTracker compatibility (with the help of your bug reports)
+      - IT v1.24 compressed samples support (Almost completed)
+      - Impulse Tracker compatibility (with the help of your bug reports too)
+
+      And: (but here, it's a dream more than a reality)
+
+      - C version of USS.ASM, USMPLAY.ASM and loaders (for portability)
+      - WINDOWS 95 version (As soon as I buy a new computer ;-)
+      - More files loaders
+      - More drivers (If I can get my hands on not implemented soundcards)
+      - Sound effects API (for games)
+      - MIDI files replay (I would really like to add this)
+
+  10. How to contact us.
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     My e-mail address : freddy.vetele@st.com
+
+     See Useless info file for more contact info.
+
+                                                   FreddyV/Useless

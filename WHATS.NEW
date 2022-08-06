@@ -1,0 +1,234 @@
+
+                        Useless Module Player v1.1
+
+                              What's new file
+ 
+                             By FreddyV/Useless
+
+
+   This file is here to explain the changes in USM Play API between 2 player 
+ version.
+
+   It's just to avoid serious errors, not to replace the usmp.doc file !
+   (Yes, lot of coders still not read the complete documentation)
+
+====================================[1.1]======================================
+
+                       USM Play v1.1b to USM Play v1.1
+
+  Functions name changes (for EOS and DOS32)
+
+  Timer_Start_   ->  Timer_Start
+  Timer_Stop_    ->  Timer_Stop
+  Display_Error_ ->  Display_Error
+
+====================================[1.1b]=====================================
+
+                       USM Play v1.04 to USM Play v1.1b
+
+
+ Changes in USMPLAY.ASM:
+ -----------------------
+
+  - New parameter in module loaders:
+
+   I'v added a new parameters in modules loader, this parameter is named
+ Loading Mode. By setting it to LM_Memory, esi is not a pointer to module
+ file name but a pointer to the file in memory. This function may be really
+ usefull (expecially if you want to use EOS LoadInternalFile function).
+
+ Here is the new xxx_Load functions API:
+
+     Description: Load a xxx file (xxx can be MOD, STM, S3M, XM ,IT or USM)
+
+     Input: ESI Offset to the file name string.
+	    EAX Default panning setting. (20202020h for Mono)
+            EBX=LM_File   Load module from a file.
+            EBX=LM_Memory Load module from memory.
+ 
+     Output: CF Clear -> USM Header pointer is in ESI 
+             CF Set -> Error code in EAX
+
+  ! If you want to load the module in memory with EOS LoadExternalFile or
+  ! LoadInternalFile, don't forget to change the amount of free memory for
+  ! EOS in SETUP.INC (NeededMem parameter must be higher )
+
+  See the example 2 in EX2\ for a memory loading example.
+
+  - New function: USMP_FreeInternalModule
+
+    This function is here to free the memory allocated when you load an
+  USM 'internal' file with the USMP_LoadInternalModule function.
+
+    You can use it if you want to load more than one 'internal ' USM file.
+  It's not a really good idea to use this in an intro as LoadInternalModule
+  doesn't allocate any memory with the GUS driver. ;-)
+
+ Changes in USS.ASM:
+ -------------------
+
+ Changes in drivers:  (If you have done a sound driver)
+ -------------------
+
+    I'v done some modification for the Impulse Tracker samples sustain loop
+  support and for a better sound card detection.
+
+ Channel Control masques changed:
+
+   CC_Stopped   EQU 1      ; Active/Stopped channel                 (0)
+   CC_Playing   EQU 2      ; A sample is played on this channel     (1)
+   CC_StopVoice EQU 4      ; Stop the sample                        (2)
+   CC_FadeVol   EQU 8      ; Fading active                          (3)
+   CC_Release   EQU 16     ; Release envelopes                      (4)
+
+   CC_ChSample  EQU 32     ; Change channel sample                  (5)
+   CC_ChPeriod  EQU 64     ; Change channel period                  (6)
+   CC_ChVolume  EQU 128    ; Change channel volume                  (7)
+   CC_ChPanning EQU 256    ; Change channel panning                 (8)
+   CC_DoRelease EQU 512    ; Stop sustain loop                      (9)
+
+   CC_Surround  EQU 1024   ; Surround                               (10)
+
+   CC_Backgrnd  EQU 2048   ; Background channel
+
+ VChSmpOffset changed:
+
+  It's no longer (Sample data @+Sample offset), it's only sample offset.
+
+ New function in sound devices:
+
+  D_Init was split in D_Detect and D_Init.
+
+  See the Sound Blaster Driver for more details.
+ 
+====================================[1.04]=====================================
+
+                       USM Play v1.03 to USM Play v1.04
+
+
+ New Sound system functions:
+ ---------------------------
+
+ - USS_SetAmpli
+
+
+====================================[1.03]=====================================
+ 
+                       USM Play v1.02 to USM Play v1.03
+
+
+ Default files panning:
+ ----------------------
+ 
+     For IT compatibility, default panning is now from 0 to 64 
+    
+     0 -Left    (00h)
+     32-Middle  (20h)
+     64-Right   (40h)
+    
+     mov eax,00404000h
+     call MOD_Load
+
+     will set the channel panning as follow:
+        
+     Channel    1 2 3 4 5 6 7 8 9 ...
+     Position   L R R L L R R L L ...
+
+ MEMORY.INC macros names:
+ ------------------------
+
+     I'v changed the memory macros names because malloc, free and maxavail
+  are used by the KERNEL 386 dos extender.
+
+     Malloc, Calloc, Free and Maxavail changed to U_Malloc, U_Calloc, U_Free
+  and U_Maxavail.
+
+ New Sound system functions:
+ ---------------------------
+
+   USS_Init 
+
+   USS_GetChannelVolume
+ 
+   USS_SetChannelVolume 
+ 
+   USS_NoteCut
+   
+   USS_NoteFade
+
+
+====================================[1.02]=====================================
+
+                       USM Play v1.01 to USM Play v1.02 
+
+
+ New parameter in files loaders:
+ -------------------------------
+ 
+    Now, you can select the default panning for each channels with 
+    MOD and STM loaders.
+   
+    You just have to write the selected values in eax
+   
+   * Example:
+   
+     mov esi,Offset MOD_File_Name
+     mov eax,7F7F7F7Fh
+     call MOD_Load
+    
+     This will load a mod file and play it in mono
+    
+    
+     mov eax,00FFFF00h
+     will set the channel panning as follow:
+        
+     Channel    1 2 3 4 5 6 7 8 9 ...
+     Position   L R R L L R R L L ...
+
+ New Sound system functions:
+ ---------------------------
+
+   USS_SetActiveChannels
+
+   USS_GetSampleVolume
+
+   USS_GetSamplePanning
+
+
+ New USMPLAY.ASM function:
+ -------------------------
+
+   USMP_SetPosition  Set the current order and row number.
+
+
+ New USMPLAY.ASM public variables:
+ ---------------------------------
+
+   _Order   (WORD)   Current position in order table
+   _Pattern (WORD)   Current Pattern number
+   _Row     (WORD)   Current row
+
+   _ChInstrument (BYTE*MAX_PLCHANNELS)  Instrument number in channels
+   _ChNote       (BYTE*MAX_PLCHANNELS)  Note
+   _ChCommand    (BYTE*MAX_PLCHANNELS)  Command number
+
+   You must remove the _ to have the WATCOM C variable name
+   ( _Order is Order in usmplay.h )
+
+ New SETUP.INC Options:
+ ----------------------
+
+    You can change the number of channels used by the sound system
+   (MAX_SSCHANNELS) or the player (MAX_PLCHANNELS).
+
+ New Error:
+ ----------
+
+  Sound system errors:  
+   - Not Enough channels available.
+
+  Player Errors:  
+   - Not Enough channels available.
+   - Wrong file version. (USM)
+    
+===============================================================================

@@ -1,0 +1,4 @@
++uss.obj +ussvar.obj +usmplay.obj +modload.obj +stmload.obj 
++s3mload.obj +xmload.obj +itload.obj +usmload.obj +loadutil.obj 
++iwdrv.obj +gusdrv.obj +sbdrv.obj +hpdrv.obj +nosnddrv.obj +mix.obj 
++error.obj +hardware.obj +memory.obj +files.obj +timer.obj +utils.obj

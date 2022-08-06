@@ -1,0 +1,147 @@
+# Makefile for the USM player EOS library.
+# Use Borland MAKE.EXE
+# 
+# By FreddyV/Useless
+
+# Library name (for eos)
+
+TARGET = usmpeos.lib
+
+# EOS resource Directory
+EOS   = C:\FV\EOS\RESOURCE
+
+# USM play source directory
+SRC   = ..\SRC
+
+# USM play include files directory
+INC   = ..\SRC
+
+# Assembler parameters
+# --------------------
+# /m2       2 passes
+# /t        Supress messages if successfull assembly
+# /dUseEOS3 Use EOS v3.0 or above (/dUseEOS for older versions)
+
+ASMPARAM = /m2 /t /I$(INC) /I$(EOS) /dUseEOS3
+
+#------------------------------------------------------------------------------
+
+ASM  = TASM $(ASMPARAM)
+LIB  = TLIB
+
+OBJS =  error.obj usmplay.obj uss.obj ussvar.obj \
+	iwdrv.obj gusdrv.obj sbdrv.obj nosnddrv.obj hpdrv.obj mix.obj \
+	usmload.obj xmload.obj modload.obj stmload.obj s3mload.obj itload.obj \
+	loadutil.obj \
+	files.obj memory.obj timer.obj hardware.obj utils.obj
+
+
+#
+#                         ** lib link **
+#
+
+$(TARGET) : $(OBJS) makefile
+	    @if exist $(TARGET) del $(TARGET) >NUL
+	    $(LIB) $(TARGET) +uss.obj +ussvar.obj +usmplay.obj
+	    $(LIB) $(TARGET) +modload.obj +stmload.obj +s3mload.obj +xmload.obj
+	    $(LIB) $(TARGET) +itload.obj +usmload.obj +loadutil.obj           
+	    $(LIB) $(TARGET) +iwdrv.obj +gusdrv.obj +sbdrv.obj +hpdrv.obj +nosnddrv.obj +mix.obj
+            $(LIB) $(TARGET) +error.obj +hardware.obj +memory.obj +files.obj +timer.obj +utils.obj
+            @del *.obj >NUL
+
+#
+#                       ** USM Player **
+#
+			 
+usmplay.obj : $(SRC)\usmplay.asm $(SRC)\utils.inc $(SRC)\usm.inc \
+              $(SRC)\usmplay.inc
+		$(ASM) $(SRC)\usmplay.asm
+
+#
+#                    ** Useless sound system **
+#
+			    
+uss.obj     : $(SRC)\uss.asm $(SRC)\uss.inc $(SRC)\utils.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\uss.asm
+	      
+ussvar.obj  : $(SRC)\ussvar.asm $(SRC)\utils.inc
+		$(ASM) $(SRC)\ussvar.asm
+
+#
+#                       ** Error handler ** (Display_Error_ function)
+#
+
+error.obj   : $(SRC)\ERROR.ASM
+		$(ASM) $(SRC)\error.asm
+	      
+#
+#                       ** Sound drivers **
+#
+
+iwdrv.obj  : $(SRC)\iwdrv.asm  $(SRC)\gusdrv.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\iwdrv.asm
+
+gusdrv.obj  : $(SRC)\gusdrv.asm  $(SRC)\gusdrv.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\gusdrv.asm
+
+sbdrv.obj  : $(SRC)\sbdrv.asm $(SRC)\utils.inc
+		$(ASM) $(SRC)\sbdrv.asm
+
+nosnddrv.obj : $(SRC)\nosnddrv.asm $(SRC)\utils.inc
+		$(ASM) $(SRC)\nosnddrv.asm
+
+hpdrv.obj    : $(SRC)\hpdrv.asm $(SRC)\utils.inc $(SRC)\mix.inc
+		$(ASM) $(SRC)\hpdrv.asm
+
+mix.obj      : $(SRC)\mix.asm $(SRC)\utils.inc $(SRC)\mix.inc
+		$(ASM) $(SRC)\mix.asm
+
+#
+#                       ** Files loaders **
+#
+
+usmload.obj  : $(SRC)\usmload.asm   $(SRC)\usmload.inc $(SRC)\utils.inc \
+	       $(SRC)\loadutil.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\usmload.asm
+
+xmload.obj   : $(SRC)\xmload.asm   $(SRC)\xmload.inc $(SRC)\utils.inc \
+	       $(SRC)\loadutil.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\xmload.asm
+	      
+modload.obj  : $(SRC)\modload.asm  $(SRC)\modload.inc $(SRC)\utils.inc \
+	       $(SRC)\loadutil.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\modload.asm
+	      
+stmload.obj  : $(SRC)\stmload.asm  $(SRC)\stmload.inc $(SRC)\utils.inc \
+	       $(SRC)\loadutil.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\stmload.asm
+
+s3mload.obj  : $(SRC)\s3mload.asm  $(SRC)\s3mload.inc $(SRC)\utils.inc \
+	       $(SRC)\loadutil.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\s3mload.asm
+
+itload.obj   : $(SRC)\itload.asm  $(SRC)\itload.inc $(SRC)\utils.inc \
+	       $(SRC)\loadutil.inc $(SRC)\ussvar.inc
+		$(ASM) $(SRC)\itload.asm
+
+loadutil.obj: $(SRC)\loadutil.asm $(SRC)\loadutil.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\loadutil.asm
+
+#
+#                       ** Misc files **
+#
+
+files.obj   : $(SRC)\files.asm $(SRC)\files.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\files.asm
+
+memory.obj  : $(SRC)\memory.asm $(SRC)\memory.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\memory.asm
+
+timer.obj   : $(SRC)\timer.asm $(SRC)\timer.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\timer.asm
+
+hardware.obj   : $(SRC)\hardware.asm $(SRC)\hardware.inc $(SRC)\utils.inc
+		$(ASM) $(SRC)\hardware.asm
+
+utils.obj   : $(SRC)\utils.asm $(SRC)\utils.inc
+		$(ASM) $(SRC)\utils.asm

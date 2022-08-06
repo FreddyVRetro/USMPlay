@@ -1,0 +1,96 @@
+
+                  Useless Module Player history file.
+                  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+   þ v1.1      (??/??/1998)
+
+      - WATCOM library for stack calling convention added (usmpws.lib)
+      - PMODEW and DOS4GW now uses the same library.
+
+      - Bug fix : PMODEW and WIN95 crash...
+      - Bug fix : Set Sample Offset command (XM and IT)
+      - Some other little replay bugs removed.
+
+   þ v1.1b     (01/20/1998)
+
+      - Big changed was done in sound drivers for a better sound card detection.
+      - There is no more full Hardware detection in GUS drivers.
+        -> You need the ULTRASND environment var to be correctly set.
+        -> The GUS driver need the HardwareInit function to be called now...
+
+      - Better ProTracker compatibility (.MOD files not done with Fast Tracker)
+      - Impulse Tracker support improved again. 
+        ->Instrument mode added.
+        ->NNA/DCT support.
+        ->Samples sustained loop.
+        ->More effects implemented.
+
+      - 'IntroMode' Flag added in SETUP.INC. 
+        (To get the smallest size for the party version of your intro)
+      - convert.exe now creates a 'setup' file (MUS_EFX.INC) with the list of
+        used effects.
+
+      - You can load modules from memory (see whats.new for more details)
+      - FreeInternalModule function added.
+
+      - HARDWARE.ASM decription added in API.TXT
+      - HardwareEnd function removed.
+        (I found it was useless while writing HARDWARE.ASM description...)
+
+      - Bug fix : No more crash with network cards (GUS Hardware detection removed)
+      - Bug fix : Mixing code was not able to mix more than 32 channels... ;-(
+      - Bug fix : Tone portamento + Release Note. (Bug found by Unreal/PULSE)
+      - Bug fix : MIX_SetAmpli funtion 'crashed' the memory when called
+                  before USMP_StartPlay and after a call to USMP_StopPlay.
+                  (Bug found by Hornet/Useless)
+
+   þ v1.04     (08/15/1997)
+
+      - Support for AMD Interwave added.
+      - S3M support added.
+      - Impulse Tracker support improved.
+      - Bug fix : XM loader crashed with some files (bug added in v1.03 ;( )
+
+   þ v1.03     (07/18/1997)  - Wired 97 Release -
+
+      - KERNEL 386 Dos extender support added and DOS4G/W support corrected.
+      - Impulse Tracker support. (loader is in alpha version)
+      - OS.INC is now in the /SRC directory, you don't need to change
+        it now. (Use of the /d TASM switch)
+      - Channels Instrument/Volume and panning values are now updated when
+        the no sound driver is used.
+      - One more bugfix in mixing routines.
+      - Set envelope position effect added.
+
+   þ v1.02     (06/18/1997)
+
+      - 16 bit samples loop are correct now. (It was a stupid bug)
+      - Wrong panning setting in MOD and STM files corrected.
+      - Some changes in USM file format. (For IT compatibility)
+      - More synchro variables and functions.
+      - whats.new and api.txt files added.
+
+   þ v1.01     (05/28/1997)
+
+      - Empty instrument bug removed. (Thanks fabrice for COSMIC2.XM)
+      - Some bugfix in mixing routines. (They couldn't mix below 13kHz)
+      - Dword alignment bug in MEMORY.ASM removed.
+      - Active envelope with no envelope point bug removed.
+      - Number of samples reduce to 128.
+      - XM files with no patterns doesn't crash the player anymore.
+        (But XM files with no patterns still be useless...)
+      - Cleaner initialisation routines. (Now, you can play more than one file)
+      - You have got more setup option to play with. (see setup.inc)
+      - WATCOM C++ example added.
+
+   þ v1.0      (04/23/1997)
+
+      - It now works with EOS v3.00á. (EOS compatibility problem)
+      - PMODE/W and WATCOM C support Added.
+      - USM Patterns are now packed.
+
+   þ v1.0 beta (01/27/1997)
+
+      - First USMplay release.
+
+ (c) 1997 FreddyV/Useless

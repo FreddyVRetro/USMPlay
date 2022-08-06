@@ -1,0 +1,22 @@
+----==========ððððð==========----
+         USM Play v1.1
+    (c) 1998 FreddyV/Useless
+
+ þ DOS32, EOS and
+   WATCOM C/C++ sound system
+ þ STM/S3M/MOD/XM/IT
+   and USM loaders
+ þ STM/S3M/MOD/XM/IT to USM 
+   converter
+ þ IW/GUS/SB/SBPro/SB16 support
+ þ Setup menu
+ þ Panning and Oversampling mix
+ þ WATCOM library included
+
+  ! New: .IT NNA/DCA support !
+
+ Full code and examples included
+----==========ððððð==========----
+  !! Don't put it on FTP/BBS !!
+  !!   For beta test only    !!
+ pkunzip -d to extract the files

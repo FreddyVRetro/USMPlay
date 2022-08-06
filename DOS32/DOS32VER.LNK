@@ -1,0 +1,7 @@
+play.obj +
+error.obj usmplay.obj uss.obj ussvar.obj +
+iwdrv.obj gusdrv.obj sbdrv.obj nosnddrv.obj hpdrv.obj mix.obj +
+xmload.obj modload.obj loadutil.obj +
+files.obj memory.obj timer.obj hardware.obj utils.obj
+-C
+;

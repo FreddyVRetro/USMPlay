@@ -1,0 +1,698 @@
+
+
+		ÛÛ   Û  ÛÛÛÛÛ   ÛÛÛ ÛÛ      /---/  /       /---/   \   /
+		ÛÛ   Û  ÛÛ      ÛÛ Û Û     /---/  /       /---/     \-/
+		ÛÛ   Û  ßßßßÛ   ÛÛ   Û    /      /____   /   /       /
+		ßßßßßß  ßßßßß   ßß   ß
+
+                         Useless Module Player v1.1
+
+               	      Application Programming Interface
+ 
+                             By FreddyV/Useless
+
+
+    This file contains a full description of the API for USS.ASM, USMPLAY.ASM,
+  File Loaders, TIMER.ASM, MEMORY.ASM HARDWARE.ASM and FILES.ASM
+
+
+    * WATCOM C/C++ users:
+    
+       The interface file (usmplay.h) contains only the more important
+     functions. A list of the available functions is at the end of this file.
+
+-------------------------------------------------------------------------------
+
+		    File Loaders API (MODLOAD.ASM, XMLOAD.ASM...)
+
+-------------------------------------------------------------------------------
+
+
+    There is only one function in each loader:
+
+   - xxx_Load
+
+     Description: Load a xxx file (xxx can be MOD, STM, S3M, XM ,IT or USM)
+
+     Input: ESI Offset to the file name string.
+	    EAX Default panning setting. (20202020h for Mono)
+            EBX=LM_File   Load module from a file.
+            EBX=LM_Memory Load module from memory.
+ 
+     Output: CF Clear -> USM Header pointer is in ESI 
+	     CF Set -> Error code in EAX
+
+
+-------------------------------------------------------------------------------
+
+			 Useless USM Play API (USMPLAY.ASM)
+
+------------------------------------------------------------------------------- 
+
+
+ Music synchro variables:
+ ------------------------
+
+	  
+ - _SynchroCount  DWORD
+    
+    It's incremented each time a Wxx or a EFxx effect occur.
+
+
+ - _SynchroVal    BYTE
+
+   _SynchroVal is set to the Wxx or EFx effect parameter.
+
+
+ - _MusicEnd      BYTE
+
+   _MusicEnd is set to 1 when the music is finished.
+
+   Note: the music is looped.
+
+
+ - _Order         WORD (0 to Orders in the music-1)
+
+   It contains the current position in the order table.
+
+
+ - _Pattern       WORD (0 to Patterns in the music-1)
+
+   It contains the current pattern number.
+
+
+ - _Row           WORD (1 to Rows in the current pattern)
+
+   It contains the current row number.
+
+
+ - _ChInstrument  BYTE*MAX_PLCHANNELS
+ 
+ - _ChNote        BYTE*MAX_PLCHANNELS
+ 
+ - _ChCommand     BYTE*MAX_PLCHANNELS
+
+
+ Order change functions.
+ -----------------------
+
+
+ - USMP_PrevOrder
+
+   Description: Go to the previous music pattern.
+
+     Input:  --
+
+     Output: --
+
+     Note:
+
+      * It can be removed if you set Use_USMP_PrevOrder to No in SETUP.INC  
+     
+ 
+ - USMP_NextOrder
+
+   Description: Go to the next music pattern.
+
+     Input:  --
+
+     Output: --
+
+     Note:
+
+      * It can be removed if you set Use_USMP_NextOrder to No in SETUP.INC  
+      
+ 
+ - USMP_SetOrder
+
+   Description: Set the current order number.
+
+     Input:  AX New Order number. (0 to Orders in music-1)
+
+     Output: --
+     
+     Note:
+
+      * It can be removed if you set Use_USMP_SetOrder to No in SETUP.INC  
+ 
+
+ - USMP_SetPosition
+
+   Description: Set the current order and row number.
+
+     Input:  AX New Order number. (0 to Orders in music-1)
+	     BX New row.          (0 to Rows in the current pattern-1)
+
+     Output: --
+     
+     Note:
+
+      * It can be removed if you set Use_USMP_SetOrder to No in SETUP.INC  
+ 
+
+ Music Load/Free functions.
+ --------------------------
+
+
+ - USMP_LoadInternalModule
+
+   Description: Load an "internal" USM file.
+
+     Input: ESI Pointer to the USM file in memory.
+
+     Output: --
+     
+     Note:
+	 
+      * The file can be included in the EXE or loaded dirrectly.
+
+ - USMP_FreeInternalModule
+
+   Description: Free an USM module loaded with LoadInternalModule.
+
+     Input: ESI Pointer to an USM Header.    
+
+     Output: CF Clear -> Ok
+	     CF Set   -> Error code in EAX.
+     
+     Note:
+
+      * It can be removed if you set UseFreeInternalModule to No in SETUP.INC
+
+ - USMP_FreeModule
+
+   Description: Free the USM module from memory.
+
+     Input: ESI Pointer to an USM Header.    
+
+     Output: CF Clear -> Ok
+	     CF Set   -> Error code in EAX.
+     
+     Note:
+
+      * You can't use this function after a call to LoadInternalModule.
+
+      * It can be removed if you set UseFreeModule to No in SETUP.INC  
+ 
+
+ Music Start/Stop functions.
+ ---------------------------
+
+ 
+ - USMP_StartPlay
+   
+   Description: Start the music replay.
+
+     Input: ESI Pointer to an USM Header.
+
+     Output: CF Clear -> Ok
+	     CF Set   -> Error code in EAX.
+
+
+ - USMP_StopPlay       
+   
+   Description: Stop the music replay.
+
+     Input: --
+
+     Output: --
+
+
+-------------------------------------------------------------------------------
+
+                       Useless Sound System API (USS.ASM)
+
+-------------------------------------------------------------------------------
+
+    USS.ASM does the complete samples and Instruments managing.
+
+    This API will change in a near future, I don't guarantee for this API
+    compatibility with the other player version.
+
+    I will add a complete API for playing sound effects (not before v1.05).
+
+	     
+ Sound system Setup/Initialisation.
+ ----------------------------------
+
+
+ - USS_Setup
+
+   Description: Display the setup menu and let the user to choose the sound 
+		output.
+
+     Input:  --
+
+     Output: CF Clear -> Ok
+	     CF Set -> The choosen device is incorrect or Escape key pressed.
+     
+     Note:
+
+      * It can be removed if you set UseSetup to No in SETUP.INC
+	(Setup code is big and Setup function need memory function)
+
+
+ - USS_SetAmpli
+ 
+   Description: Define the amplification value for the mixed devices.
+   
+     Input:  EAX Amplification value (0-65535)
+
+     Output: --
+     
+   
+
+ - USS_AutoSetup
+
+   Description: It does an automatic sound device detection.
+
+     Input: --
+
+     Output: --
+     
+     Note: 
+	       
+      * The detected device is the best available device.
+	( GUS first, then SB16 ...)
+
+      * It can be removed if you set UseAutoSetup to No in SETUP.INC  
+
+ - USS_Init 
+ 
+   Description : Sound System initialisation.
+   
+     Input: --
+
+     Output: -- 
+
+     Note: This function is called by USMP_StartPlay
+       
+ - USS_SetActiveChannels
+
+   Description: Set the number of active sound system channels
+   
+     Input: Number of channels to use.   
+     
+     Output: --
+
+
+ Sound Stop/Start functions.
+ ---------------------------
+
+
+ - USS_StartOutput
+
+   Description: Start the Sound System sound output.
+
+     Input:  ESI Pointer to the periodic function called by the sound driver.
+
+     Output: CF Clear -> Ok
+	     CF Set -> Error code in EAX
+     
+     Note:
+      
+      * The periodic function can be called by the computer timer or a
+	sound card IRQ.
+	When the function is called, eax contains the number of periode 
+	( one period is 1/1193180 second) elapsed since the previouscall.
+
+       * The number of active channels MUST be set before with the 
+	 USS_SetActiveChannels function.
+
+
+ - USS_StopOutput
+
+   Description: Stop the Sound System sound output.
+
+     Input:  --
+
+     Output: CF Clear -> Ok
+	     CF Set -> Error in EAX
+
+
+ - USS_UpdateOutput
+
+ - USS_UpdateInstr
+
+
+ Samples Load and Free functions.
+ --------------------------------
+
+ 
+ - USS_LoadSample
+
+ - USS_FreeSample
+
+
+ Global or channels sound functions.
+ -----------------------------------
+
+
+ - USS_GetGlobalVolume
+
+ - USS_SetGlobalVolume
+
+ - USS_GetChannelVolume
+ 
+ - USS_SetChannelVolume
+ 
+ - USS_StartInstrument
+ 
+ - USS_InitInstrEnv
+
+ - USS_SetEnvPos
+ 
+ - USS_GetSampleVolume
+
+ - USS_GetSamplePanning
+
+ - USS_SetSampleOffset
+ 
+ - USS_SetNote
+ 
+ - USS_GetPeriod
+ 
+ - USS_SetPeriod
+
+ - USS_GetNotePeriod
+ 
+ - USS_GetVolume
+ 
+ - USS_SetVolume
+ 
+ - USS_GetPanning
+ 
+ - USS_SetPanning
+
+ - USS_NoteCut
+ 
+ - USS_NoteFade
+ 
+ - USS_KeyOff
+
+-------------------------------------------------------------------------------
+
+                      Memory manager API (MEMORY.ASM)
+
+-------------------------------------------------------------------------------
+
+
+  - _Maxavail  
+  
+    Description: Return the length of the biggest available memory block.
+  
+    Input: --
+
+    Output: EAX Length of the biggest available memory block.
+
+    Note:
+     
+     * This function is not available if you are using WATCOM C/C++
+
+  - _Malloc
+  
+    Description: Allocate a memory block.
+
+    Input: EAX Amount of needed Memory.
+
+    Output: CF Clear -> Memory block @ in EAX
+	    CF Set -> Error code in EAX
+
+  - _Calloc    
+  
+    Description: Allocate and clear a memory block.
+
+    Input: EAX Amount of needed Memory.
+
+    Output: CF Clear -> Memory block @ in EAX
+	    CF Set -> Error code in EAX
+
+  - _Free      Free a memory block.
+
+    Description: Free a memory block.
+
+    Input: EAX @ of the memory block to free.
+
+    Output: CF Clear -> Ok
+	    CF Set -> Error code in EAX
+
+-------------------------------------------------------------------------------
+
+                         Timer manager API (TIMER.ASM)
+
+-------------------------------------------------------------------------------
+
+  - Timer_Start
+		       
+     Description: Start a timer.
+
+     Input: EAX Timer Procedure Offset
+	    EBX Timer Speed ( 1193180/EBX hz )
+		       
+     Output: CF clear -> Ok
+	     CF set   -> EAX=TE_NoFreeTimer (No more timer available)
+
+     Note:
+
+      * You can't start more than "max_timers" timers (defined in SETUP.INC)
+
+  - Timer_Stop
+
+     Description: Stop a timer.
+
+     Input: EAX Timer Proc to stop.
+
+     Output: CF clear -> Ok
+	     CF set   -> EAX=TE_NotFound (It's not a correct proc offset)
+
+
+-------------------------------------------------------------------------------
+
+                      'Hardware' functions API (HARDWARE.ASM)
+
+-------------------------------------------------------------------------------
+
+
+    HARDWARE.ASM and HARDWARE.INC included all the IRQ/DMA functions.
+    They are also used to initialise the pointers to the more usefull
+  informations in memory. (PSP, Environment variables and 'Zero' Offset)
+
+
+  - Public variable:
+
+    ZeroOffset, PSPOffset and EnvOffset
+    
+     Note:
+     
+     * They are initialised by the 'HardwareInit' Function
+
+  - HardwareInit
+		       
+     Description: It does all the public variable initialisation and
+                  the DMA buffer allocation.
+
+     Input: --
+		       
+     Output: --
+
+     Note:
+
+      * This MUST be the first funtion call if you use USMPLAY.
+
+  - GetEnvOffset
+  
+     Description: Returns the Environement variable Offset
+
+     Input: EAX, Offset of the variable name
+
+     Output: EDI, Variable offset if CF cleared
+
+
+     Example:
+     
+        BlasterEnv DB 7,'BLASTER'       ; 7 is the environment var size.
+
+        mov eax,Offset BlasterEnv
+	call GetEnvOffset
+        jc Error
+
+  - DMA_Setup
+   
+     Description: Program a channel on the 8237 DMA controler.
+     
+     Input: AL  Mode Register  ( bits 0..1 ignored )
+            AH  channel   ( 0..7 )
+            EBX Physical Base Address ( 0..0ffffffh )
+            ECX Bytes to transfer     ( 1..10000h )
+
+     Output: --
+
+     Note:
+     
+     * This function was done by Adam Seychell (DOS32 coder)     
+
+    - IRQ_Enable
+
+     Description: Enable an Hardware IRQ
+                                                                         
+     Input: DL, IRQ Number                                                   
+                                                                         
+     Output: --                                                             
+
+  - IRQ_Disable
+
+     Description: Disable an Hardware IRQ
+                                                                         
+     Input: DL, IRQ Number                                                   
+                                                                         
+     Output: --                                                             
+
+
+  Macros defined in HARDWARE.INC:
+
+
+  - SetInt Macro Inter,Select,Offs
+
+     Description: Set a new interrupt function
+     
+  - GetInt Macro Inter,_Ptr
+
+     Description: Get an interrupt function pointer
+
+  - RestInt Macro Inter,_Ptr
+
+     Description: Restore an interrupt function 
+
+  - SetIRQ Macro IRQ,Select,Offs
+
+     Description: Set a new interrupt function
+
+  - GetIRQ Macro IRQ,_Ptr
+
+     Description: Get an interrupt function pointer
+
+  - RestIRQ Macro IRQ,_Ptr
+
+     Description: Restore an interrupt function 
+
+
+-------------------------------------------------------------------------------
+
+	 Available functions/variables for WATCOM C/C++ (in USMPLAY.H)
+
+-------------------------------------------------------------------------------
+
+
+ Useless USM Play Functions/Variables (USMPLAY.ASM)
+ --------------------------------------------------
+
+
+   Synchro variables.
+
+ - unsigned int   SynchroCount;
+ - unsigned char  SynchroVal;
+ - unsigned char  MusicEnd;
+ - unsigned short Order;      (0 to Orders in the music-1)
+ - unsigned short Pattern;    (0 to Patterns in the music-1)
+ - unsigned short Row;        (1 to Rows in the current pattern)
+
+ - unsigned short ChInstrument[MAX_PLCHANNELS];
+ - unsigned short ChNote[MAX_PLCHANNELS];
+ - unsigned short ChCommand[MAX_PLCHANNELS];
+
+
+   Player functions.
+
+
+ - void USMP_LoadInternalModule(void *music);
+
+ - void USMP_FreeInternalModule(void *music);
+
+
+ - void USMP_FreeModule(void *music);
+
+
+ - void USMP_StartPlay(void *music);
+
+ - void USMP_StopPlay(void);
+
+
+ - void USMP_PrevOrder(void);
+
+ - void USMP_NextOrder(void);
+
+ - void USMP_SetOrder(unsigned int order);
+
+ - void USMP_SetPosition(unsigned int order, unsigned int row);
+
+
+ Useless Sound System functions (USS.ASM)
+ ----------------------------------------
+
+ 
+ - void USS_Setup(void);
+
+ - void USS_AutoSetup(void);
+
+ - void USS_SetAmpli(int Ampli);
+
+
+ Some device information.
+ ------------------------
+
+ - char *DEV_Name;                Device Name
+ - unsigned short DEV_BasePort;   Device Base Port
+ - unsigned char DEV_IRQ;         Device Interrupt
+ - unsigned char DEV_DMA;         Device DMA
+
+
+ Files loaders (STMLOAD.ASM, MODLOAD.ASM, XMLOAD.AXM ...)
+ --------------------------------------------------------
+ 
+
+ - void *MOD_Load(unsigned int loadmode, unsigned int panning, char *filename);
+
+ - void *STM_Load(unsigned int loadmode, unsigned int panning, char *filename);
+
+ - void *S3M_Load(unsigned int loadmode, unsigned int panning, char *filename);
+
+ - void *XM_Load(unsigned int loadmode, unsigned int panning, char *filename);
+
+ - void *IT_Load(unsigned int loadmode, unsigned int panning, char *filename);
+
+ - void *USM_Load(unsigned int loadmode, unsigned int panning, char *filename);
+
+ * loadmode can be LM_Memory or LM_File (Load from memory or load from a file)
+
+
+ Timer functions (TIMER.ASM)
+ ---------------------------
+
+
+ - int Timer_Start(void *function,int speed);
+
+ - int Timer_Stop(void *function);
+
+  ! When you use a timer in WATCOM C, remove the stack checking.
+    (Add the -s parametter in the compiler command line)
+
+
+ Error variable and function (ERROR.ASM)
+ ---------------------------------------
+
+ 
+ - int Error_Number;
+
+   It contains the Error number. 0 for no error.
+
+
+ - void Display_Error(int Error_Number);
+ 
+   Call this to display the error name.
+   
+
+ 'Hardware' Init function (HARDWARE.ASM)
+ ---------------------------------------
+
+
+ - void HardwareInit(unsigned long psp);

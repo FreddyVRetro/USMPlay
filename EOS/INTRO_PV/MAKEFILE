@@ -1,0 +1,86 @@
+# Makefile for EOS Party version intros
+# To be used with Borland MAKE.EXE
+#
+# (c) 1997 FreddyV/Useless
+
+# MUSIC Directory/Name
+MUSDIR = ..\..\DATA
+MUSICNAME = chipblue
+MUSIC = $(MUSICNAME).xm
+
+# INTRO Name
+INTRO = eosintro
+
+# EOS resource Directory
+EOS = D:\EXTENDER\EOS3\RESOURCE
+
+# USMPLAY directory
+USMPDIR = ..\..
+
+# USM play source directory
+SRC = $(USMPDIR)\SRC
+
+# USM play include files directory
+INC = $(USMPDIR)\SRC
+
+# USM play binary files directory
+BIN = $(USMPDIR)
+
+# Assembler parameters
+# --------------------
+# /m2       2 passes
+# /t        Supress messages if successfull assembly
+# /dUseEOS3 Use EOS v3.0 or above (/dUseEOS for older versions)
+
+ASMPARAM = /m2 /t /I$(INC) /I$(EOS) /dUseEOS3
+
+# Linker parameters
+
+LINKPARAM = 
+
+ASM      = TASM $(ASMPARAM)
+LINK     = TLINK $(LINKPARAM)
+
+OBJLIST     = $(MUSICNAME).INC $(INTRO).obj \
+              usmplay.obj uss.obj ussvar.obj \
+              gusdrv.obj nosnddrv.obj \
+              timer.obj hardware.obj
+
+$(INTRO).exe : $(OBJLIST)
+              $(LINK) $(EOS)\eoslite @$(INTRO).LNK
+
+# Build the MUSIC .INC file (with the bin2inc utility)
+
+$(MUSICNAME).inc : $(MUSDIR)\$(MUSIC)
+              $(BIN)\usmconv $(MUSDIR)\$(MUSIC)
+              $(BIN)\bin2inc $(MUSICNAME).usm
+
+# Build the intro .OBJ file.
+
+$(INTRO).obj : $(INTRO).asm $(SRC)\utils.inc
+              $(ASM) $(INTRO).asm
+
+# USMPLAY files
+
+usmplay.obj : $(SRC)\usmplay.asm $(SRC)\utils.inc $(SRC)\usm.inc setup.inc \
+              mus_efx.inc
+              $(ASM) $(SRC)\usmplay.asm
+
+uss.obj     : $(SRC)\uss.asm $(SRC)\uss.inc $(SRC)\utils.inc $(SRC)\ussvar.inc \
+              setup.inc mus_efx.inc
+              $(ASM) $(SRC)\uss.asm
+
+ussvar.obj  : $(SRC)\ussvar.asm $(SRC)\utils.inc setup.inc mus_efx.inc
+              $(ASM) $(SRC)\ussvar.asm
+
+gusdrv.obj  : $(SRC)\gusdrv.asm  $(SRC)\gusdrv.inc $(SRC)\utils.inc
+              $(ASM) $(SRC)\gusdrv.asm
+
+nosnddrv.obj  : $(SRC)\nosnddrv.asm  $(SRC)\utils.inc
+                $(ASM) $(SRC)\nosnddrv.asm
+
+timer.obj   : $(SRC)\timer.asm $(SRC)\timer.inc $(SRC)\utils.inc
+              $(ASM) $(SRC)\timer.asm
+
+hardware.obj  : $(SRC)\hardware.asm $(SRC)\hardware.inc setup.inc
+              $(ASM) $(SRC)\hardware.asm
